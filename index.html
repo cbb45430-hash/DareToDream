@@ -1,12 +1,15 @@
 <!DOCTYPE html><html><head><meta charset='utf-8'/><style>
-body{margin:0;background:#000;overflow:hidden;display:flex;justify-content:center;align-items:center;height:100vh;}
-canvas{background:#111;border:3px solid #00ffcc;box-shadow:0 0 20px #00ffcc;cursor:none;}
+html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
+/* 【完全修正】プリムの形状に合わせて、ゲーム画面を縦横どちらも自動で最大化して中央にフィットさせます */
+canvas{max-width:100%;max-height:100%;object-fit:contain;border:3px solid #00ffcc;box-shadow:0 0 20px #00ffcc;cursor:none;}
 </style></head><body><canvas id='g' width='800' height='600'></canvas><script>
 const c=document.getElementById('g'),ctx=c.getContext('2d');
 let pw=130,ph=15,px=(c.width-pw)/2,br=10,x=c.width/2,y=c.height-40,dx=5,dy=-5;
 let rows=5,cols=8,bw=85,bh=25,pad=10,offT=60,offL=30,score=0,over=false,bricks=[];
 for(let i=0;i<cols;i++){bricks[i]=[];for(let j=0;j<rows;j++)bricks[i][j]={x:0,y:0,s:1};}
-function move(e){let rect=c.getBoundingClientRect(),rx=(e.clientX||e.touches.clientX)-rect.left;
+/* 💡 マウス位置の計算も全画面拡大の比率に対応させました */
+function move(e){let rect=c.getBoundingClientRect(),scaleX=c.width/rect.width;
+let rx=((e.clientX||e.touches.clientX)-rect.left)*scaleX;
 if(rx>0&&rx<c.width)px=rx-pw/2;if(over){over=false;document.location.reload();}}
 window.addEventListener('mousemove',move);window.addEventListener('touchmove',move);
 window.addEventListener('click',()=>{if(over){over=false;document.location.reload();}});
@@ -23,4 +26,3 @@ else if(y+dy>c.height-br-20){if(x>px&&x<px+pw){let hit=(x-(px+pw/2))/(pw/2);dx=h
 else{ctx.fillStyle='#ff3333';ctx.font='50px sans-serif';ctx.textAlign='center';
 ctx.fillText('GAME OVER',c.width/2,c.height/2-20);ctx.font='24px sans-serif';ctx.fillText('Click to Restart',c.width/2,c.height/2+30);over=true;return;}}
 x+=dx;y+=dy;requestAnimationFrame(draw);}draw();</script></body></html>
-
