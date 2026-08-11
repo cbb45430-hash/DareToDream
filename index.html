@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head><meta charset='utf-8'/><style>
-html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
-canvas{width:100vw;height:100vh;object-fit:fill;border:none;box-shadow:none;cursor:none;}
+/* 💡 ここで画面全体の背景色を完全に「真っ黒」に固定します */
+html,body{margin:0;padding:0;background-color:#000000 !important;overflow:hidden;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
+canvas{width:100vw;height:100vh;object-fit:fill;border:none;box-shadow:none;cursor:none;background-color:transparent;}
 </style></head><body>
 <canvas id='g' width='1200' height='600'></canvas><script>
 const c=document.getElementById('g'),ctx=c.getContext('2d');
@@ -14,22 +15,18 @@ if(!over&&rx>0&&rx<c.width)px=rx-pw/2;}
 window.addEventListener('mousemove',move);window.addEventListener('touchmove',move);
 window.addEventListener('click',()=>{if(over){over=false;score=0;x=c.width/2;y=c.height-40;dx=6;dy=-6;px=(c.width-pw)/2;initBricks();}});
 
-// 💡 ちらつき（フリッカー）防止用のフレームレート制限タイマー
 let lastTime = 0;
-const fpsInterval = 1000 / 35; // 毎秒35フレームに制限（SLの描画エンジンが追いつく限界値）
+const fpsInterval = 1000 / 30; // 💡 SLに最適な毎秒30フレームに調整
 
 function draw(timestamp) {
     requestAnimationFrame(draw);
 
-    // 時間の経過をチェックし、一定時間が過ぎていなければ描画をスキップ（これがちらつきを抑えます）
     const elapsed = timestamp - lastTime;
     if (elapsed < fpsInterval) return;
     lastTime = timestamp - (elapsed % fpsInterval);
 
-    // 描画処理の開始
+    // 💡 毎フレームのクリア処理（背景はCSSに任せるため透明になります）
     ctx.clearRect(0,0,c.width,c.height);
-    ctx.fillStyle = '#000000';
-    ctx.fillRect(0,0,c.width,c.height);
     
     let activeBricks=0;
     ctx.textAlign='left';
@@ -83,7 +80,7 @@ function draw(timestamp) {
         ctx.fillText('Click to Restart',c.width/2,c.height/2+30);
     }
 }
-// ループの開始（最初のフレームにタイムスタンプを渡す）
+
 requestAnimationFrame((timestamp) => {
     lastTime = timestamp;
     draw(timestamp);
