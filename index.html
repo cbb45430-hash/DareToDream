@@ -1,6 +1,7 @@
 <!DOCTYPE html><html><head><meta charset='utf-8'/><style>
-html,body{margin:0;padding:0;background-color:#000000 !important;overflow:hidden;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
-canvas{width:100vw;height:100vh;object-fit:fill;border:none;box-shadow:none;cursor:none;}
+html,body{margin:0;padding:0;background:#000;overflow:hidden;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
+/* 💡 画面サイズを完全に強制固定し、ズレを防止します */
+canvas{width:100vw;height:100vh;object-fit:fill;border:none;box-shadow:none;cursor:none;display:block;}
 </style></head><body>
 <canvas id='g' width='1200' height='600'></canvas><script>
 const c=document.getElementById('g'),ctx=c.getContext('2d');
@@ -14,18 +15,9 @@ if(!over&&rx>0&&rx<c.width)px=rx-pw/2;}
 window.addEventListener('mousemove',move);window.addEventListener('touchmove',move);
 window.addEventListener('click',()=>{if(over){over=false;score=0;x=c.width/2;y=c.height-40;dx=6;dy=-6;px=(c.width-pw)/2;initBricks();}});
 
-let lastTime = 0;
-const fpsInterval = 1000 / 30; // SLブラウザに最適な毎秒30フレーム制限
-
-function draw(timestamp) {
-    requestAnimationFrame(draw);
-
-    const elapsed = timestamp - lastTime;
-    if (elapsed < fpsInterval) return;
-    lastTime = timestamp - (elapsed % fpsInterval);
-
-    // 💡【残像を完全に消去する決定打】
-    // 毎フレーム、真っ黒な四角形で画面全体を強制的に塗りつぶし、古い描画データを上書きして消します
+// 💡 描画と更新をひとつの関数に完全にまとめます
+function loop() {
+    // 💡 毎フレーム完全に画面を塗りつぶし、右側の点々バグを強制リセットします
     ctx.fillStyle = '#000000';
     ctx.fillRect(0, 0, c.width, c.height);
     
@@ -44,8 +36,9 @@ function draw(timestamp) {
         }
     }
     
+    // パドルの位置を計算（c.heightからの相対位置に修正してズレを防止）
     ctx.fillStyle='#ffffff';
-    ctx.fillRect(px,c.height-ph-15,pw,ph);
+    ctx.fillRect(px, c.height - ph - 15, pw, ph);
     
     ctx.beginPath();
     ctx.arc(x,y,br,0,6.28);
@@ -82,8 +75,6 @@ function draw(timestamp) {
     }
 }
 
-requestAnimationFrame((timestamp) => {
-    lastTime = timestamp;
-    draw(timestamp);
-});
+// 💡 SLブラウザで最も安定する固定タイマー（30ミリ秒間隔＝約33FPS）に変更
+setInterval(loop, 30);
 </script></body></html>
