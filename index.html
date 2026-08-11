@@ -1,7 +1,6 @@
 <!DOCTYPE html><html><head><meta charset='utf-8'/><style>
-/* 💡 ここで画面全体の背景色を完全に「真っ黒」に固定します */
 html,body{margin:0;padding:0;background-color:#000000 !important;overflow:hidden;width:100%;height:100%;display:flex;justify-content:center;align-items:center;}
-canvas{width:100vw;height:100vh;object-fit:fill;border:none;box-shadow:none;cursor:none;background-color:transparent;}
+canvas{width:100vw;height:100vh;object-fit:fill;border:none;box-shadow:none;cursor:none;}
 </style></head><body>
 <canvas id='g' width='1200' height='600'></canvas><script>
 const c=document.getElementById('g'),ctx=c.getContext('2d');
@@ -16,7 +15,7 @@ window.addEventListener('mousemove',move);window.addEventListener('touchmove',mo
 window.addEventListener('click',()=>{if(over){over=false;score=0;x=c.width/2;y=c.height-40;dx=6;dy=-6;px=(c.width-pw)/2;initBricks();}});
 
 let lastTime = 0;
-const fpsInterval = 1000 / 30; // 💡 SLに最適な毎秒30フレームに調整
+const fpsInterval = 1000 / 30; // SLブラウザに最適な毎秒30フレーム制限
 
 function draw(timestamp) {
     requestAnimationFrame(draw);
@@ -25,8 +24,10 @@ function draw(timestamp) {
     if (elapsed < fpsInterval) return;
     lastTime = timestamp - (elapsed % fpsInterval);
 
-    // 💡 毎フレームのクリア処理（背景はCSSに任せるため透明になります）
-    ctx.clearRect(0,0,c.width,c.height);
+    // 💡【残像を完全に消去する決定打】
+    // 毎フレーム、真っ黒な四角形で画面全体を強制的に塗りつぶし、古い描画データを上書きして消します
+    ctx.fillStyle = '#000000';
+    ctx.fillRect(0, 0, c.width, c.height);
     
     let activeBricks=0;
     ctx.textAlign='left';
